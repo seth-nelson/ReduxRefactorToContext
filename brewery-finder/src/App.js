@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { BreweryContext } from './contexts/BreweryContext';
+import axios from 'axios';
 
-function App() {
+import BreweryList from './components/BreweryList';
+import SearchForm from './components/SearchForm';
+
+import './App.css';
+import { Header } from './components/Styles';
+
+
+const App = () => {
+
+  const [ breweries, setBreweries ] = useState([])
+  
+  useEffect(() => {
+    axios
+      .get(`https://api.openbrewerydb.org/breweries`)
+      .then(response => {
+        const breweries = response.data.results
+        setBreweries(breweries)
+        console.log(breweries);
+      })
+      .catch(error => {
+        console.log('error loading data', error);
+      })
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BreweryContext.Provider value={{breweries, setBreweries}}>
+      <Header className="App">
+        <h1>Northwest Breweries</h1>
+        <h3>Find your next stop</h3>
+        <SearchForm />
+        <BreweryList />
+      </Header>
+    </BreweryContext.Provider>
   );
 }
+
 
 export default App;
